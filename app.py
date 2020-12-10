@@ -180,4 +180,4 @@ def on_buffer_states(json):
 if __name__ == '__main__':
     models.initialize();
     socketio.run(app);
-    #app.run(debug=DEBUG, port=PORT)
+    app.run(debug=DEBUG, port=PORT)
