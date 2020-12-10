@@ -1,5 +1,6 @@
 click==7.1.2
 dnspython==1.16.0
+eventlet==0.29.1
 Flask==1.1.2
 Flask-Cors==3.0.9
 Flask-SocketIO==4.3.2
