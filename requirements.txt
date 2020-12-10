@@ -1,0 +1,17 @@
+click==7.1.2
+dnspython==1.16.0
+Flask==1.1.2
+Flask-Cors==3.0.9
+Flask-SocketIO==4.3.2
+greenlet==0.4.17
+gunicorn==20.0.4
+itsdangerous==1.1.0
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+peewee==3.14.0
+psycopg2==2.8.6
+python-dotenv==0.15.0
+python-engineio==3.14.2
+python-socketio==4.6.1
+six==1.15.0
+Werkzeug==1.0.1
