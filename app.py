@@ -176,9 +176,10 @@ def on_buffer_states(json):
 
 if 'ON_HEROKU' in os.environ:
     models.initialize();
-    socketio.run(app);
+    
+    # models.initialize();
 
 if __name__ == '__main__':
     models.initialize();
-    app.run(debug=DEBUG, port=PORT)
+    # app.run(debug=DEBUG, port=PORT)
     socketio.run(app);
