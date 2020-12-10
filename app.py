@@ -174,8 +174,8 @@ def on_buffer_states(json):
                 # reset_votes_flags(room);
             break;
 
-if 'ON_HEROKU' in os.environ:
-    models.initialize();
+# if 'ON_HEROKU' in os.environ:
+#     models.initialize();
 
 if __name__ == '__main__':
     models.initialize();
