@@ -16,7 +16,6 @@ import os;
 PORT = os.getenv("PORT");
 SECRET = os.getenv("SECRET");
 
-# CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 app = Flask(__name__);
@@ -24,6 +23,8 @@ app.config['SECRET_KEY'] = SECRET;
 socketio = SocketIO(app, cors_allowed_origins="*");
 
 app.register_blueprint(session, url_prefix="/api/sessions");
+
+CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 @app.before_request
 def before_request():
