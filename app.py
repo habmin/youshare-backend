@@ -16,7 +16,7 @@ import os;
 PORT = os.getenv("PORT");
 SECRET = os.getenv("SECRET");
 
-CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
+# CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 app = Flask(__name__);
