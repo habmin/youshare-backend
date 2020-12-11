@@ -16,11 +16,10 @@ import os;
 PORT = os.getenv("PORT");
 SECRET = os.getenv("SECRET");
 
-CORS(session, origins="*");
+CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 app = Flask(__name__);
 app.config['SECRET_KEY'] = SECRET;
-app.config['CORS_HEADERS'] = 'Content-Type';
 if 'ON_HEROKU' in os.environ:
     print('extra heroku configs activated');
     app.config['SESSION_COOKIE_SECURE'] = True;
@@ -30,8 +29,7 @@ socketio = SocketIO(app, cors_allowed_origins="*");
 
 app.register_blueprint(session, url_prefix="/api/sessions");
 
-CORS(app, origins="*");
-
+CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 @app.before_request
 def before_request():

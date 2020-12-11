@@ -8,7 +8,6 @@ session = Blueprint('sessions', 'session');
 
 # GET to return all rooms
 @session.route('/', methods=['GET'])
-@cross_origin()
 def get_all_sessions():
     try:
         sessions = [model_to_dict(session) for session in models.Session.select()];
@@ -19,7 +18,6 @@ def get_all_sessions():
 
 # GET to return specifically only specified room
 @session.route('/<room>', methods=['GET'])
-@cross_origin()
 def find_session(room):
     try: 
         found = models.Session.get_or_none(models.Session.room_name == room);
@@ -35,7 +33,6 @@ def find_session(room):
 
 # Create a Room
 @session.route('/', methods=['POST'])
-@cross_origin()
 def create_sessions():
     payload = request.get_json();
     print(payload, 'payload');
@@ -45,7 +42,6 @@ def create_sessions():
 
 # Delete a room
 @session.route('/<room>', methods=['DELETE'])
-@cross_origin()
 def delete_session(room):
     session = models.Session.delete().where(models.Session.room_name == room);
     num_of_rows_deleted = session.execute();
@@ -61,7 +57,6 @@ def delete_session(room):
 
 # Add A Video To The Playlist
 @session.route('/<room>', methods=["PUT"])
-@cross_origin()
 def add_video(room):
     payload = request.get_json();
     pprint(payload);
@@ -88,7 +83,6 @@ def add_video(room):
 
 # Delete a video from the playlist
 @session.route('/<room>/nextVideo', methods=['DELETE'])
-@cross_origin()
 def remove_video(room):
     payload = request.get_json();
     #pprint(payload);
