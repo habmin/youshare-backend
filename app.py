@@ -20,12 +20,16 @@ SECRET = os.getenv("SECRET");
 app = Flask(__name__);
 app.config['SECRET_KEY'] = SECRET;
 app.config['CORS_HEADERS'] = 'Content-Type';
+if 'ON_HEROKU' in os.environ:
+    print('extra heroku configs activated');
+    app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_SAMESITE='None');
+)
 socketio = SocketIO(app, cors_allowed_origins="*");
 
 app.register_blueprint(session, url_prefix="/api/sessions");
 
-CORS(session);
-CORS(app);
+CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
+CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 @app.before_request
 def before_request():
