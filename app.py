@@ -87,7 +87,7 @@ def on_connection(json):
                 all_rooms.append(new_room);
     #pprint(all_rooms);
     #pprint('**** User ' + str(json['username']) + " (sid: " + str(request.sid) + ") connected to room " + str(json['room']));
-    emit('connection', {"username": str(json['username']), "connected_users": all_rooms[room_index]['connected_users']}, room=json['room']);
+    emit('connection', {"connected_users": all_rooms[room_index]['connected_users']}, room=json['room']);
     return {"sessionID": request.sid, "username": str(json['username']), "connected_users": all_rooms[room_index]['connected_users']};
 
 # removes a user from all_rooms[user's room] whenever the disconnect
@@ -98,11 +98,13 @@ def on_disconnect():
         for i in range(0, len(room['connected_users'])):
             if room['connected_users'][i].get('sessionID') == request.sid:
                 del room['connected_users'][i];
+                emit('connection', {"connected_users": room['connected_users']} , room=room['room_name'])
                 if len(room['connected_users']) == 0:
                     del all_rooms[i];
+                break;
+        else:
+            continue;
         break;
-    #pprint(all_rooms);
-    #pprint(str(request.sid) + ' has disconnected');
 
 # forwards whatever video a users adds on their front-end
 # is added to the queue to everyone in the room
@@ -179,5 +181,5 @@ def on_buffer_states(json):
 
 if __name__ == '__main__':
     models.initialize();
-    socketio.run(app, port=PORT);
+    socketio.run(app);
     app.run(debug=DEBUG, port=PORT)

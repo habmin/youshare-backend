@@ -58,7 +58,7 @@ def delete_session(room):
 @session.route('/<room>', methods=["PUT"])
 def add_video(room):
     payload = request.get_json();
-    #pprint(payload);
+    pprint(payload);
     try: 
         found = models.Session.get_or_none(models.Session.room_name == room);
         if found:
@@ -90,7 +90,7 @@ def remove_video(room):
         if found:
             session = model_to_dict(models.Session.get(models.Session.room_name == room));
             #pprint(session)
-            if session['playlist'][0]:
+            if session['playlist']:
                 session['playlist'].pop(0);
                 #pprint(session);
                 update = models.Session.update(**session).where(models.Session.room_name == room);
