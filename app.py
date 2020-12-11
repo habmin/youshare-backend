@@ -24,7 +24,7 @@ socketio = SocketIO(app, cors_allowed_origins="*");
 
 app.register_blueprint(session, url_prefix="/api/sessions");
 
-CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
+CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com'], supports_credentials=True);
 CORS(app, origins=['http://localhost:3000', 'https://youshare-frontend.herokuapp.com']);
 
 @app.before_request
