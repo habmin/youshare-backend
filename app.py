@@ -128,16 +128,10 @@ def on_player_state(json):
 def on_voting(json):
     #print("voting triggered")
     global all_rooms
-    skip = False
-    for room in all_rooms:
-        if room['room_name'] == json['room']:
-            room['negative_votes'] += json['negativeVotes'];
-            #print(f"{room['negative_votes']} votes, must exceed vote of {len(room['connected_users']) / 2}")
-            if room['negative_votes'] >= len(room['connected_users']) / 2:
-                skip = True
-                reset_votes_flags(room)
-                emit('voting', skip, room=json['room'])
-        break
+    all_rooms[json['room']]['negative_votes'] += json['negativeVotes']
+    if all_rooms[json['room']]['negative_votes'] >= len(all_rooms[json['room']]['connected_users']) / 2:
+        reset_flags(all_rooms[json['room']])
+        emit('voting', True, room=json['room'])
 
 # tests to make sure everyone's video has ended before telling the front end
 # to progress to the next video in the queue
