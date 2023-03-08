@@ -34,10 +34,19 @@ def find_session(room):
 @session.route('/', methods=['POST'])
 def create_sessions():
     payload = request.get_json();
-    print(payload, 'payload')
-    session = models.Session.create(**payload)
-    sess_to_dict = model_to_dict(session)
-    return jsonify(data=sess_to_dict, status={"code": 201, "message": "Session Created"})
+    try: 
+        found = models.Session.get_or_none(models.Session.room_name == payload['room_name'])
+        if found:
+            session = model_to_dict(models.Session.get(models.Session.room_name == payload['room_name']))
+            return jsonify(
+                data=session, 
+                status={"code": 200, "message": f"Retrived Session Room {payload['room_name']}"})
+        else:
+            session = models.Session.create(**payload)
+            sess_to_dict = model_to_dict(session)
+            return jsonify(data=sess_to_dict, status={"code": 201, "message": "Session Created"})
+    except models.DoesNotExist:
+        return jsonify(data={}, status={"code": 401, "message": "Error"})
 
 # Delete a room
 @session.route('/<room>', methods=['DELETE'])

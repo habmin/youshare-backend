@@ -7,7 +7,6 @@ from pprint import pprint
 import models
 from blueprints.sessions import session
 
-DEBUG = True
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,6 +14,10 @@ load_dotenv()
 import os
 PORT = os.getenv("PORT")
 SECRET = os.getenv("SECRET")
+if os.getenv("DEBUG"):
+    DEBUG = True
+else:
+    DEBUG = False
 
 CORS(session, origins=['http://localhost:3000', 'https://youshare-frontend.fly.dev'])
 
