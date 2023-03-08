@@ -45,6 +45,8 @@ def after_request(response):
 
 # hashmap containing all rooms, which in turn keeps track of each room's votes and flags
 all_rooms = {}
+# indexing hashmap to find rooms by a user's session ID in request.id
+all_users = {}
 
 # helper function to add room properties object when creating rooms.
 def room_dict(user):
@@ -66,10 +68,11 @@ def reset_votes_flags(room):
     room['buffer_flags'] = 0
     room['error'] = False
 
-# joins a user into a room
+# when a user joins or creates a room - initial connection
 @socketio.on('connection')
 def on_connection(json):
     global all_rooms
+    global all_users
     join_room(json['room'])
     user_dict = {
         "username": str(json['username']),
@@ -81,20 +84,8 @@ def on_connection(json):
     # else creates a new room with user
     else:
         all_rooms[json['room']] = room_dict(user_dict)
-    # if (len(all_rooms) == 0):
-    #     new_room = room_dict(str(json['room']), user_dict)
-    #     all_rooms.append(new_room)
-    # else:
-    #     # if there are active rooms, searches to see if a room exists to append the user
-    #     # else if there isn't a match, creates a new room.
-    #     for i in range(0, len(all_rooms)):
-    #         if all_rooms[i].get('room_name') == str(json['room']):
-    #             all_rooms[i]['connected_users'].append(user_dict)
-    #             room_index = i
-    #             break
-    #         elif (i == len(all_rooms) - 1):
-    #             new_room = room_dict(str(json['room']), user_dict)
-    #             all_rooms.append(new_room)
+    all_users[request.sid] = json['room']
+
     #pprint(all_rooms)
     #pprint('**** User ' + str(json['username']) + " (sid: " + str(request.sid) + ") connected to room " + str(json['room']))
     emit('connection', {"connected_users": all_rooms[json["room"]]['connected_users']}, room=json['room'])
@@ -104,17 +95,16 @@ def on_connection(json):
 @socketio.on('disconnect')
 def on_disconnect():
     global all_rooms
-    for room in all_rooms:
-        for i in range(0, len(room['connected_users'])):
-            if room['connected_users'][i].get('sessionID') == request.sid:
-                del room['connected_users'][i]
-                emit('connection', {"connected_users": room['connected_users']} , room=room['room_name'])
-                if len(room['connected_users']) == 0:
-                    del all_rooms[i]
-                break
-        else:
-            continue
-        break
+    global all_users
+    for user in all_rooms[all_users[request.sid]]["connected_users"]:
+        if user["sessionID"] == request.sid:
+            all_rooms[all_users[request.sid]]["connected_users"].remove(user)
+            if len(all_rooms[all_users[request.sid]]["connected_users"]) == 0:
+                del all_rooms[all_users[request.sid]]
+            else:
+                emit('connection', {"connected_users": all_rooms[all_users[request.sid]]["connected_users"]} , room=all_users[request.sid])
+            break
+    del all_users[request.sid]
 
 # forwards whatever video a users adds on their front-end
 # is added to the queue to everyone in the room
@@ -173,18 +163,11 @@ def on_next_video(json):
 @socketio.on('buffer-states')
 def on_buffer_states(json):
     global all_rooms;
-    for room in all_rooms:
-        if room['room_name'] == json['room']:
-            room['buffer_flags'] += 1
-            # print("Flags so far: " + str(room['buffer_flags']) + " out of " + str(len(room['connected_users'])))
-            if json['error']:
-                room['error'] = True
-                # print(f"error state is now {room['error']}")
-            if room['buffer_flags'] == len(room['connected_users']) and room['error'] == True:
-                # print("force-next-video sent")
-                emit('force-next-video', json, room=json['room'])
-                # reset_votes_flags(room)
-            break
+    all_rooms[json['room']]['buffer_flags'] += 1
+    if json['error']:
+        all_rooms[json['room']]['error'] = True
+    if all_rooms[json['room']]['buffer_flags'] == len(all_rooms[json['room']]['connected_users']) and all_rooms[json['room']]['error'] == True:
+        emit('force-next-video', json, room=json['room'])
 
 if 'ON_HEROKU' in os.environ:
     models.initialize()
