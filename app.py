@@ -43,13 +43,12 @@ def after_request(response):
 
 # SOCKET ROUTES
 
-# list containing all rooms, which in turn keeps track of each room's votes and flags
-all_rooms = []
+# hashmap containing all rooms, which in turn keeps track of each room's votes and flags
+all_rooms = {}
 
 # helper function to add room properties object when creating rooms.
-def room_dict(room, user):
+def room_dict(user):
     room_dict_filled = {
-        "room_name": room,
         "connected_users": [user],
         "negative_votes": 0,
         "ended_flags": 0,
@@ -71,31 +70,35 @@ def reset_votes_flags(room):
 @socketio.on('connection')
 def on_connection(json):
     global all_rooms
-    room_index = 0
     join_room(json['room'])
     user_dict = {
         "username": str(json['username']),
         "sessionID": request.sid
     };
-    # if there are no active rooms, creates a room
-    if (len(all_rooms) == 0):
-        new_room = room_dict(str(json['room']), user_dict)
-        all_rooms.append(new_room)
+    # if there is an active room, append user to coonnected room
+    if json['room'] in all_rooms.keys():
+        all_rooms[json["room"]]['connected_users'].append(user_dict)
+    # else creates a new room with user
     else:
-        # if there are active rooms, searches to see if a room exists to append the user
-        # else if there isn't a match, creates a new room.
-        for i in range(0, len(all_rooms)):
-            if all_rooms[i].get('room_name') == str(json['room']):
-                all_rooms[i]['connected_users'].append(user_dict)
-                room_index = i
-                break
-            elif (i == len(all_rooms) - 1):
-                new_room = room_dict(str(json['room']), user_dict)
-                all_rooms.append(new_room)
+        all_rooms[json['room']] = room_dict(user_dict)
+    # if (len(all_rooms) == 0):
+    #     new_room = room_dict(str(json['room']), user_dict)
+    #     all_rooms.append(new_room)
+    # else:
+    #     # if there are active rooms, searches to see if a room exists to append the user
+    #     # else if there isn't a match, creates a new room.
+    #     for i in range(0, len(all_rooms)):
+    #         if all_rooms[i].get('room_name') == str(json['room']):
+    #             all_rooms[i]['connected_users'].append(user_dict)
+    #             room_index = i
+    #             break
+    #         elif (i == len(all_rooms) - 1):
+    #             new_room = room_dict(str(json['room']), user_dict)
+    #             all_rooms.append(new_room)
     #pprint(all_rooms)
     #pprint('**** User ' + str(json['username']) + " (sid: " + str(request.sid) + ") connected to room " + str(json['room']))
-    emit('connection', {"connected_users": all_rooms[room_index]['connected_users']}, room=json['room'])
-    return {"sessionID": request.sid, "username": str(json['username']), "connected_users": all_rooms[room_index]['connected_users']}
+    emit('connection', {"connected_users": all_rooms[json["room"]]['connected_users']}, room=json['room'])
+    return {"sessionID": request.sid, "username": str(json['username']), "connected_users": all_rooms[json["room"]]['connected_users']}
 
 # removes a user from all_rooms[user's room] whenever the disconnect
 @socketio.on('disconnect')
