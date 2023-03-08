@@ -61,7 +61,7 @@ def room_dict(user):
     return room_dict_filled
 
 # helper function to reset votes and flags for a room during videos 
-def reset_votes_flags(room):
+def reset_flags(room):
     room['negative_votes'] = 0
     room['ended_flags'] = 0
     room['ready_flags'] = 0
@@ -144,17 +144,10 @@ def on_voting(json):
 @socketio.on('next-video')
 def on_next_video(json):
     global all_rooms
-    next_video = False
-    for room in all_rooms:
-        if room['room_name'] == json['room']:
-            room['ended_flags'] += 1
-            #print(f"{room['ended_flags']} flags, must meet {len(room['connected_users'])}")
-            if room['ended_flags'] == len(room['connected_users']):
-                #print("condition met")
-                next_video = True
-                reset_votes_flags(room)
-                emit('next-video', next_video, room=json['room'])
-        break
+    all_rooms[json['room']]['ended_flags'] += 1
+    if all_rooms[json['room']]['ended_flags'] == len(all_rooms[json['room']]['connected_users']):
+        reset_flags(all_rooms[json['room']])
+        emit('next-video', True, room=json['room'])
 
 # monitors 'buffer' states of users
 # confirms that everyone has loaded and played the same video
