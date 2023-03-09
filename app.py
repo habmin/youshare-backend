@@ -14,7 +14,7 @@ load_dotenv()
 import os
 PORT = os.getenv("PORT")
 SECRET = os.getenv("SECRET")
-if os.getenv("DEBUG"):
+if os.getenv("DEBUG") == "1":
     DEBUG = True
 else:
     DEBUG = False

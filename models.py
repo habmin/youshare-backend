@@ -5,12 +5,8 @@ import datetime
 import os
 from dotenv import load_dotenv
 load_dotenv()
-if os.getenv("DEBUG"):
-    DEBUG = True
-else:
-    DEBUG = False
 
-if DEBUG:
+if os.getenv("DEBUG") == "1":
     print('DEV Address Used')
     DATABASE = SqliteDatabase('sessions.sqlite')
 else:
