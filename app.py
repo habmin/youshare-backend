@@ -159,8 +159,8 @@ def on_buffer_states(json):
     if all_rooms[json['room']]['buffer_flags'] == len(all_rooms[json['room']]['connected_users']) and all_rooms[json['room']]['error'] == True:
         emit('force-next-video', json, room=json['room'])
 
-if 'ON_HEROKU' in os.environ:
-    models.initialize()
+# if 'ON_HEROKU' in os.environ:
+#     models.initialize()
 
 if __name__ == '__main__':
     models.initialize()

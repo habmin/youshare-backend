@@ -1,2 +1,2 @@
 # Modify this Procfile to fit your needs
-web: gunicorn hellofly:app
+web: gunicorn app:app

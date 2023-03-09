@@ -3,13 +3,19 @@ from playhouse.sqlite_ext import JSONField
 from playhouse.db_url import connect
 import datetime
 import os
-
-if 'ON_HEROKU' in os.environ:
-    print('ONHEROKU address used')
-    DATABASE = connect(os.environ.get('DATABASE_URL'))
+from dotenv import load_dotenv
+load_dotenv()
+if os.getenv("DEBUG"):
+    DEBUG = True
 else:
-    print('DEV Address used')
+    DEBUG = False
+
+if DEBUG:
+    print('DEV Address Used')
     DATABASE = SqliteDatabase('sessions.sqlite')
+else:
+    print('DEPLOY Address Used')
+    DATABASE = connect(os.environ.get('DATABASE_URL'))
 
 class Session(Model):
     room_name = CharField(unique = True)
